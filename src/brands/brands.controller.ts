@@ -1,7 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  BadRequestException,
+} from '@nestjs/common';
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
+import * as qs from 'qs';
 
 @Controller('brands')
 export class BrandsController {
@@ -13,8 +24,17 @@ export class BrandsController {
   }
 
   @Get()
-  findAll() {
-    return this.brandsService.findAll();
+  findAll(@Query('filter') filterString?: string) {
+    let filter: any = {};
+
+    if (filterString) {
+      try {
+        filter = qs.parse(filterString); // parse LoopBack-style
+      } catch (err) {
+        throw new BadRequestException('Invalid filter query');
+      }
+    }
+    return this.brandsService.findAll(filter);
   }
 
   @Get(':id')
