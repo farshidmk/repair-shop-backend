@@ -12,6 +12,7 @@ import { RepairRecordsModule } from './repair-records/repair-records.module';
 import { RepairRecordServicesModule } from './repair-record-services/repair-record-services.module';
 import { ServicesModule } from './services/services.module';
 import { PartRemindersModule } from './part-reminders/part-reminders.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { PartRemindersModule } from './part-reminders/part-reminders.module';
     RepairRecordServicesModule,
     ServicesModule,
     PartRemindersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
