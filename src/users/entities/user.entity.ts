@@ -22,14 +22,17 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'full_name', type: 'text' })
-  fullName: string;
+  @Column({ name: 'first_name', type: 'text' })
+  firstName: string;
+
+  @Column({ name: 'last_name', type: 'text' })
+  lastName: string;
 
   @Column({ name: 'phone_number', type: 'text', unique: true })
   phoneNumber: string;
 
-  @Column({ name: 'password_hash', type: 'text', nullable: true })
-  passwordHash?: string;
+  @Column({ name: 'password', type: 'text', nullable: false })
+  password: string;
 
   @Column({ name: 'role', type: 'enum', enum: UserRole, enumName: 'role' })
   role: UserRole;

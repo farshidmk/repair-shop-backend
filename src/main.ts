@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { VersioningType } from '@nestjs/common';
+import { BadRequestException, VersioningType } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +22,24 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Remove fields not in DTO
+      forbidNonWhitelisted: true, // Throw error for extra fields
+      transform: true, // Automatically transform payloads to DTOs
+      exceptionFactory: (errors) => {
+        const result = errors.map((err) => {
+          // pick only the first constraint message per field
+          return {
+            field: err.property,
+            message: Object.values(err.constraints ?? {}),
+          };
+        });
+        return new BadRequestException(result);
+      },
+    }),
+  );
 
   const port = process.env.PORT ?? 3000;
   console.log(`app is running on port ${port}`);

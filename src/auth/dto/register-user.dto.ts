@@ -6,7 +6,8 @@ import {
   MinLength,
 } from 'class-validator';
 import { UserRole } from 'src/users/entities/user.entity';
-export class CreateUserDto {
+
+export class RegisterUserDto {
   @IsString()
   @IsNotEmpty()
   firstName: string;
@@ -20,7 +21,7 @@ export class CreateUserDto {
   phoneNumber: string;
 
   @IsString()
-  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  @MinLength(6, { message: 'رمز عبور باید حداقل 6 کارکتر داشته باشد' })
   password: string;
 
   @IsEnum(UserRole)
