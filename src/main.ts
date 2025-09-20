@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { BadRequestException, VersioningType } from '@nestjs/common';
 import { ValidationPipe } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,6 +18,11 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, documentFactory);
   SwaggerModule.setup('swagger', app, documentFactory, {
     jsonDocumentUrl: 'swagger',
+  });
+
+  app.enableCors({
+    origin: 'http://localhost:5000', // frontend URL
+    credentials: true, // allow cookies (important for auth)
   });
 
   app.enableVersioning({
@@ -41,6 +47,7 @@ async function bootstrap() {
     }),
   );
 
+  app.use(cookieParser());
   const port = process.env.PORT ?? 3000;
   console.log(`app is running on port ${port}`);
   await app.listen(process.env.PORT ?? 3000);
