@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import queryStringFilterToTypeOrmObject from 'src/global/queryStringFilter';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 import { Brand } from './entities/brand.entity';
@@ -13,25 +13,56 @@ export class BrandsService {
     private brandsRepo: Repository<Brand>,
   ) {}
 
-  create(createBrandDto: CreateBrandDto) {
+  async create(createBrandDto: CreateBrandDto) {
+    const isExist = await this.brandsRepo.findOne({
+      where: {
+        enName: ILike(createBrandDto.enName),
+      },
+    });
+    if (isExist) {
+      throw new BadRequestException('برند با این نام وجود دارد');
+    }
     const form = this.brandsRepo.create(createBrandDto);
     return this.brandsRepo.save(form);
   }
 
-  findAll(filter: any) {
+  async findAll(filter: any) {
     const filterObject = queryStringFilterToTypeOrmObject(filter);
-    return this.brandsRepo.find(filterObject);
+    return await this.brandsRepo.find(filterObject);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} brand`;
+  async findOne(id: number) {
+    const brand = await this.brandsRepo.findOneBy({ id });
+    if (!brand) {
+      throw new BadRequestException('برندی با این مشخصات وجود ندارد');
+    }
+    return brand;
   }
 
-  update(id: number, updateBrandDto: UpdateBrandDto) {
-    return `This action updates a #${id} brand`;
+  async update(id: number, updateBrandDto: UpdateBrandDto) {
+    const brand = await this.findOne(id);
+
+    // If enName is being updated, check for duplicates (case-insensitive)
+    if (updateBrandDto.enName) {
+      const isExist = await this.brandsRepo.findOne({
+        where: {
+          enName: ILike(updateBrandDto.enName),
+        },
+      });
+
+      if (isExist && isExist.id !== id) {
+        throw new BadRequestException('برند با این نام وجود دارد');
+      }
+    }
+
+    // Merge changes
+    Object.assign(brand, updateBrandDto);
+
+    return this.brandsRepo.save(brand);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} brand`;
+  async remove(id: number) {
+    const brand = await this.findOne(id);
+    return await this.brandsRepo.remove(brand);
   }
 }
