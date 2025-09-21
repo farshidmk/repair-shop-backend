@@ -1,7 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ModelsService } from './models.service';
 import { CreateModelDto } from './dto/create-model.dto';
 import { UpdateModelDto } from './dto/update-model.dto';
+import { QueryFilter } from 'src/common/decorators/queryFilter.decorator';
+import { Model } from './entities/model.entity';
+import type { QueryFilterType } from 'src/common/types/queryFilter';
 
 @Controller('models')
 export class ModelsController {
@@ -13,8 +24,8 @@ export class ModelsController {
   }
 
   @Get()
-  findAll() {
-    return this.modelsService.findAll();
+  findAll(@QueryFilter(Model) filter: QueryFilterType<Model>) {
+    return this.modelsService.findAll(filter);
   }
 
   @Get(':id')

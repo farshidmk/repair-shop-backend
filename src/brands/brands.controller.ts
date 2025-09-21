@@ -13,12 +13,14 @@ import {
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
-import * as qs from 'qs';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user.entity';
+import { QueryFilter } from 'src/common/decorators/queryFilter.decorator';
+import { Brand } from './entities/brand.entity';
+import type { QueryFilterType } from 'src/common/types/queryFilter';
 
 @Controller('brands')
 export class BrandsController {
@@ -33,16 +35,7 @@ export class BrandsController {
   }
 
   @Get()
-  findAll(@Query('filter') filterString?: string) {
-    let filter: any = {};
-
-    if (filterString) {
-      try {
-        filter = qs.parse(filterString); // parse LoopBack-style
-      } catch (err) {
-        throw new BadRequestException('Invalid filter query');
-      }
-    }
+  findAll(@QueryFilter(Brand) filter: QueryFilterType<Brand>) {
     return this.brandsService.findAll(filter);
   }
 

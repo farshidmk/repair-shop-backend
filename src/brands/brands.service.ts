@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import queryStringFilterToTypeOrmObject from 'src/global/queryStringFilter';
 import { Repository, ILike } from 'typeorm';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
@@ -27,8 +26,7 @@ export class BrandsService {
   }
 
   async findAll(filter: any) {
-    const filterObject = queryStringFilterToTypeOrmObject(filter);
-    return await this.brandsRepo.find(filterObject);
+    return await this.brandsRepo.find(filter);
   }
 
   async findOne(id: number) {
